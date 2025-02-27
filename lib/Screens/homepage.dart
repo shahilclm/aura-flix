@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:auraflixx/Screens/moviedetailpage.dart';
 import 'package:auraflixx/Service/movieApi.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -98,93 +99,97 @@ class _HomepageState extends State<Homepage> {
                         autoPlayInterval: const Duration(seconds: 4),
                       ),
                       items: movieList!.take(5).map((movie) {
-                        return Container(
-                          width: 310,
-                          margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(36),
-                            color: Colors.white38,
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                'https://image.tmdb.org/t/p/w500${movie['backdrop_path']}',
+                        return GestureDetector(onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MovieDetailPage(movie: movie),));
+                        },
+                          child: Container(
+                            width: 310,
+                            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(36),
+                              color: Colors.white38,
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  'https://image.tmdb.org/t/p/w500${movie['backdrop_path']}',
+                                ),
+                                fit: BoxFit.cover, // Ensure image fits nicely
                               ),
-                              fit: BoxFit.cover, // Ensure image fits nicely
                             ),
-                          ),
-                          child: Column(
-                            children: [
-                              SizedBox(
-                                height: 15,
-                              ),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  blurContainer(
-                                    width: 92,
-                                    height: 64,
-                                    borderRadius: 18,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.start,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(left: 8.0),
-                                          child: Text(
-                                            'Rating',
-                                            style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w500),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    blurContainer(
+                                      width: 92,
+                                      height: 64,
+                                      borderRadius: 18,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(left: 8.0),
+                                            child: Text(
+                                              'Rating',
+                                              style: TextStyle(
+                                                  color: Colors.deepOrange,
+                                                  fontWeight: FontWeight.w500),
+                                            ),
                                           ),
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceAround,
-                                          children: [
-                                            Icon(
-                                              Icons.star,
-                                              color: Colors.yellow,
-                                              size: 19,
-                                            ),
-                                            Text(
-                                              '${(movie['vote_average'] as num).toStringAsFixed(1)}',
-                                              // Ensures only 2 decimal places
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w900,
-                                                fontSize: 19,
+                                          Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Icon(
+                                                Icons.star,
+                                                color: Colors.yellow,
+                                                size: 19,
                                               ),
-                                            ),
-                                          ],
-                                        )
-                                      ],
+                                              Text(
+                                                '${(movie['vote_average'] as num).toStringAsFixed(1)}',
+                                                // Ensures only 2 decimal places
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w900,
+                                                  fontSize: 19,
+                                                ),
+                                              ),
+                                            ],
+                                          )
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    width: 15,
-                                  )
-                                ],
-                              ),
-                              Spacer(),
-                              blurContainer(
-                                height: 91,
-                                width: MediaQuery.of(context).size.width / 1.5,
-                                borderRadius: 24,
-                                child: Center(
-                                    child: Text(
-                                  '${movie['title']}',
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w500),
-                                )),
-                              ),
-                              SizedBox(
-                                height: 15,
-                              )
-                            ],
+                                    SizedBox(
+                                      width: 15,
+                                    )
+                                  ],
+                                ),
+                                Spacer(),
+                                blurContainer(
+                                  height: 91,
+                                  width: MediaQuery.of(context).size.width / 1.5,
+                                  borderRadius: 24,
+                                  child: Center(
+                                      child: Text(
+                                    '${movie['title']}',
+                                    style: TextStyle(
+                                        color: Colors.deepOrange,
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w500),
+                                  )),
+                                ),
+                                SizedBox(
+                                  height: 15,
+                                )
+                              ],
+                            ),
                           ),
                         );
                       }).toList(),

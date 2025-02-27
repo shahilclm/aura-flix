@@ -13,11 +13,12 @@ class MoviePage extends StatefulWidget {
 }
 
 class _MoviePageState extends State<MoviePage> {
+  final TextEditingController _searchController = TextEditingController();
   List<dynamic>? movieList;
+  List<dynamic>? searchList;
   bool isLoading = true;
   String errorMessage = '';
-
-  final Random _random = Random(); // To generate random heights
+  final Random _random = Random();
 
   @override
   void initState() {
@@ -40,6 +41,26 @@ class _MoviePageState extends State<MoviePage> {
     }
   }
 
+  Future<void> _searchMovie() async {
+    final String query=_searchController.text.trim();
+    try {
+      var response = await MovieApi.searchMovie(search:query);
+      setState(() {
+        searchList = response['results'];
+      });
+    } catch (e) {
+      setState(() {
+        searchList = [];
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,7 +74,11 @@ class _MoviePageState extends State<MoviePage> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   'Find Movies, TV Series, and More',
-                  style: TextStyle(fontSize: 26, color: Colors.white, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 26,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ),
@@ -65,16 +90,34 @@ class _MoviePageState extends State<MoviePage> {
                 borderRadius: BorderRadius.circular(20),
                 color: const Color(0xff211F30),
               ),
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 12.0),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12.0),
                 child: TextField(
-                  style: TextStyle(color: Colors.white),
+                  controller: _searchController,
+                  style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
-                    prefixIcon: Icon(Icons.search, color: Colors.white),
+                    prefixIcon: GestureDetector(
+                      onTap: _searchMovie,
+                      child: const Icon(Icons.search, color: Colors.white),
+                    ),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? GestureDetector(
+                      onTap: () {
+
+                        _searchController.clear();
+                        setState(() {
+                          searchList = null;
+                        });
+                        _fetchMovies();
+                      },
+                      child: const Icon(Icons.clear, color: Colors.white),
+                    )
+                        : null,
                     border: InputBorder.none,
                     hintText: 'Search',
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: const TextStyle(color: Colors.grey),
                   ),
+                  onSubmitted: (value) => _searchMovie(),
                 ),
               ),
             ),
@@ -86,51 +129,114 @@ class _MoviePageState extends State<MoviePage> {
                   ? Center(
                 child: Text(
                   errorMessage,
-                  style: const TextStyle(color: Colors.red, fontSize: 18),
+                  style: const TextStyle(
+                      color: Colors.red, fontSize: 18),
                 ),
               )
-                  : MasonryGridView.count(
-                padding: const EdgeInsets.symmetric(horizontal: 10),
-                itemCount: movieList?.length ?? 0,
-                crossAxisCount: 2, // 2 columns
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 10,
-                itemBuilder: (context, index) {
-                  var movie = movieList![index];
-
-                  // Generate a random height for staggered effect
-                  double randomHeight = _random.nextInt(100) + 180; // Height between 180-280
-
-                  return Column(
-                    children: [
-                      GestureDetector(onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => MovieDetailPage(movie: movie),)),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(16),
-                          child: CachedNetworkImage(
-                            imageUrl: 'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
-                            placeholder: (context, url) => Container(
-                              height: randomHeight,
-                              color: Colors.grey[900],
-                              child: const Center(child: CircularProgressIndicator()),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Container(height: randomHeight, color: Colors.grey[800], child: const Icon(Icons.error, color: Colors.red)),
-                            height: randomHeight,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 5,),
-                      Text('${movie['title']}',style: TextStyle(color: Colors.white,fontSize: 17,fontWeight: FontWeight.w500),),
-                      const SizedBox(height: 5,),
-                    ],
-                  );
-                },
-              ),
+                  : searchList != null && searchList!.isNotEmpty
+                  ? _buildSearchResults() // Show search results as ListView
+                  : _buildTrendingMovies(), // Show trending movies in a grid
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchResults() {
+    return ListView.builder(
+      itemCount: searchList!.length,
+      itemBuilder: (context, index) {
+        var movie = searchList![index];
+        return ListTile(
+          leading: ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: CachedNetworkImage(
+              imageUrl:
+              'https://image.tmdb.org/t/p/w92${movie['poster_path']}',
+              placeholder: (context, url) => Container(
+                width: 50,
+                height: 75,
+                color: Colors.grey[900],
+                child: const Center(child: CircularProgressIndicator()),
+              ),
+              errorWidget: (context, url, error) =>
+              const Icon(Icons.error, color: Colors.red),
+              width: 50,
+              height: 75,
+              fit: BoxFit.cover,
+            ),
+          ),
+          title: Text(
+            movie['title'] ?? 'No Title',
+            style: const TextStyle(color: Colors.white),
+          ),
+          subtitle: Text(
+            'Rating: ${movie['vote_average']}',
+            style: const TextStyle(color: Colors.grey),
+          ),
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => MovieDetailPage(movie: movie),
+            ));
+          },
+        );
+      },
+    );
+  }
+
+  Widget _buildTrendingMovies() {
+    return MasonryGridView.count(
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      itemCount: movieList?.length ?? 0,
+      crossAxisCount: 2,
+      mainAxisSpacing: 10,
+      crossAxisSpacing: 10,
+      itemBuilder: (context, index) {
+        var movie = movieList![index];
+        double randomHeight = _random.nextInt(100) + 180;
+
+        return Column(
+          children: [
+            GestureDetector(
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => MovieDetailPage(movie: movie),
+                ),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: CachedNetworkImage(
+                  imageUrl:
+                  'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
+                  placeholder: (context, url) => Container(
+                    height: randomHeight,
+                    color: Colors.grey[900],
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) => Container(
+                    height: randomHeight,
+                    color: Colors.grey[800],
+                    child: const Icon(Icons.error, color: Colors.red),
+                  ),
+                  height: randomHeight,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              movie['title'] ?? 'No Title',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 5),
+          ],
+        );
+      },
     );
   }
 }
