@@ -9,4 +9,10 @@ static Future getTrendingMovie()async{
   print(response);
   return response.data;
 }
+static Future getRelatedMovie({required int id})async{
+  var dio=await DioHelper.getInstance();
+  var response=await dio.get('$relatedMovie/$id/similar?api_key=$apiKey');
+  print(response);
+  return response.data;
+}
 }
