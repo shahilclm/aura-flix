@@ -1,0 +1,2 @@
+/home/sys25/Desktop/flutter_projects/aura-flix/android/app/.cxx/Debug/4f1k526m/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/sys25/Desktop/flutter_projects/aura-flix/android/app/.cxx/Debug/4f1k526m/armeabi-v7a/CMakeFiles/rebuild_cache.dir

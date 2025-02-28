@@ -4,6 +4,7 @@ import 'package:auraflixx/Service/movieApi.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+import 'package:sizer/sizer.dart';
 
 class MoviePage extends StatefulWidget {
   const MoviePage({super.key});
@@ -42,9 +43,9 @@ class _MoviePageState extends State<MoviePage> {
   }
 
   Future<void> _searchMovie() async {
-    final String query=_searchController.text.trim();
+    final String query = _searchController.text.trim();
     try {
-      var response = await MovieApi.searchMovie(search:query);
+      var response = await MovieApi.searchMovie(search: query);
       setState(() {
         searchList = response['results'];
       });
@@ -102,16 +103,15 @@ class _MoviePageState extends State<MoviePage> {
                     ),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? GestureDetector(
-                      onTap: () {
-
-                        _searchController.clear();
-                        setState(() {
-                          searchList = null;
-                        });
-                        _fetchMovies();
-                      },
-                      child: const Icon(Icons.clear, color: Colors.white),
-                    )
+                            onTap: () {
+                              _searchController.clear();
+                              setState(() {
+                                searchList = null;
+                              });
+                              _fetchMovies();
+                            },
+                            child: const Icon(Icons.clear, color: Colors.white),
+                          )
                         : null,
                     border: InputBorder.none,
                     hintText: 'Search',
@@ -126,16 +126,16 @@ class _MoviePageState extends State<MoviePage> {
               child: isLoading
                   ? const Center(child: CircularProgressIndicator())
                   : errorMessage.isNotEmpty
-                  ? Center(
-                child: Text(
-                  errorMessage,
-                  style: const TextStyle(
-                      color: Colors.red, fontSize: 18),
-                ),
-              )
-                  : searchList != null && searchList!.isNotEmpty
-                  ? _buildSearchResults() // Show search results as ListView
-                  : _buildTrendingMovies(), // Show trending movies in a grid
+                      ? Center(
+                          child: Text(
+                            errorMessage,
+                            style: const TextStyle(
+                                color: Colors.red, fontSize: 18),
+                          ),
+                        )
+                      : searchList != null && searchList!.isNotEmpty
+                          ? _buildSearchResults() // Show search results as ListView
+                          : _buildTrendingMovies(), // Show trending movies in a grid
             ),
           ],
         ),
@@ -152,16 +152,15 @@ class _MoviePageState extends State<MoviePage> {
           leading: ClipRRect(
             borderRadius: BorderRadius.circular(8),
             child: CachedNetworkImage(
-              imageUrl:
-              'https://image.tmdb.org/t/p/w92${movie['poster_path']}',
+              imageUrl: 'https://image.tmdb.org/t/p/w92${movie['poster_path']}',
               placeholder: (context, url) => Container(
-                width: 50,
+                width: 50.w,
                 height: 75,
                 color: Colors.grey[900],
                 child: const Center(child: CircularProgressIndicator()),
               ),
               errorWidget: (context, url, error) =>
-              const Icon(Icons.error, color: Colors.red),
+                  const Icon(Icons.error, color: Colors.red),
               width: 50,
               height: 75,
               fit: BoxFit.cover,
@@ -208,7 +207,7 @@ class _MoviePageState extends State<MoviePage> {
                 borderRadius: BorderRadius.circular(16),
                 child: CachedNetworkImage(
                   imageUrl:
-                  'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
+                      'https://image.tmdb.org/t/p/w500${movie['poster_path']}',
                   placeholder: (context, url) => Container(
                     height: randomHeight,
                     color: Colors.grey[900],
