@@ -4,6 +4,7 @@ import 'package:auraflixx/Screens/moviedetailpage.dart';
 import 'package:auraflixx/Service/movieApi.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 
 import '../common_widgets/blurcontainer.dart';
 
@@ -61,9 +62,16 @@ class _HomepageState extends State<Homepage> {
               Container(
                 width: MediaQuery.of(context).size.width / 1.1,
                 height: 200,
-                
-                decoration: BoxDecoration(color: Colors.red,borderRadius: BorderRadius.circular(25)),
-                child: ClipRRect(borderRadius: BorderRadius.circular(25), child : Image(image: NetworkImage('https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/08/how-strong-is-spider-man-in-comics-movies-and-beyond.jpg',),fit: BoxFit.fill,)),
+                decoration: BoxDecoration(
+                    color: Colors.red, borderRadius: BorderRadius.circular(25)),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(25),
+                    child: Image(
+                      image: NetworkImage(
+                        'https://static1.colliderimages.com/wordpress/wp-content/uploads/2024/08/how-strong-is-spider-man-in-comics-movies-and-beyond.jpg',
+                      ),
+                      fit: BoxFit.fill,
+                    )),
               ),
               SizedBox(
                 height: 20,
@@ -99,11 +107,15 @@ class _HomepageState extends State<Homepage> {
                         autoPlayInterval: const Duration(seconds: 4),
                       ),
                       items: movieList!.take(5).map((movie) {
-                        return GestureDetector(onTap: () {
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => MovieDetailPage(movie: movie),));
-                        },
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  MovieDetailPage(movie: movie),
+                            ));
+                          },
                           child: Container(
-                            width: 310,
+                            width: 50.w,
                             margin: const EdgeInsets.symmetric(horizontal: 5.0),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(36),
@@ -134,8 +146,8 @@ class _HomepageState extends State<Homepage> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Padding(
-                                            padding:
-                                                const EdgeInsets.only(left: 8.0),
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0),
                                             child: Text(
                                               'Rating',
                                               style: TextStyle(
@@ -153,7 +165,8 @@ class _HomepageState extends State<Homepage> {
                                                 size: 19,
                                               ),
                                               Text(
-                                                '${(movie['vote_average'] as num).toStringAsFixed(1)}',
+                                                (movie['vote_average'] as num)
+                                                    .toStringAsFixed(1),
                                                 // Ensures only 2 decimal places
                                                 style: const TextStyle(
                                                   color: Colors.white,
@@ -174,7 +187,8 @@ class _HomepageState extends State<Homepage> {
                                 Spacer(),
                                 blurContainer(
                                   height: 91,
-                                  width: MediaQuery.of(context).size.width / 1.5,
+                                  width:
+                                      MediaQuery.of(context).size.width / 1.5,
                                   borderRadius: 24,
                                   child: Center(
                                       child: Text(
