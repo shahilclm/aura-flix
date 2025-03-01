@@ -1,6 +1,9 @@
+import 'package:auraflixx/Screens/playmoviescreen.dart';
 import 'package:auraflixx/Service/movieApi.dart';
+import 'package:auraflixx/common_widgets/blurcontainer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:readmore/readmore.dart';
 
 class MovieDetailPage extends StatefulWidget {
@@ -15,11 +18,13 @@ class MovieDetailPage extends StatefulWidget {
 class _MovieDetailPageState extends State<MovieDetailPage> {
   List<dynamic> relatedmovie = [];
   Map<String, dynamic> detailsMovie = {};
+  List<dynamic> movieCast = [];
 
   @override
   void initState() {
     _relatedMovie();
     _detailsMovie();
+    _getCast();
     // TODO: implement initState
     super.initState();
   }
@@ -43,6 +48,18 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
       var response = await MovieApi.detailsMovie(id: widget.movie['id']);
       setState(() {
         detailsMovie = response;
+      });
+    } catch (e) {
+      print('error$e');
+    }
+  }
+
+  //Cast details
+  Future<void> _getCast() async {
+    try {
+      var response = await MovieApi.getCast(id: widget.movie['id']);
+      setState(() {
+        movieCast = response['cast'];
       });
     } catch (e) {
       print('error$e');
@@ -74,11 +91,12 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                   color: Colors.grey[800],
                   child: const Icon(Icons.error, color: Colors.red),
                 ),
-                height: 400,
+                height: 300,
                 width: MediaQuery.of(context).size.width,
                 fit: BoxFit.cover,
               ),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SizedBox(
                     height: 50,
@@ -93,7 +111,31 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
                           Icons.arrow_back_ios_new_rounded,
                           color: Colors.white,
                         )),
-                  )
+                  ),
+                  SizedBox(
+                    height: 40,
+                  ),
+                  Center(
+                      child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                PlayMovieScreen(movieId: widget.movie['id']),
+                          ));
+                    },
+                    child: blurContainer(
+                        height: 60,
+                        width: 60,
+                        borderRadius: 35,
+                        child: Center(
+                            child: Icon(
+                          Icons.play_arrow_sharp,
+                          size: 40,
+                          color: Colors.red,
+                        ))),
+                  ))
                 ],
               )
             ]),
@@ -115,11 +157,23 @@ class _MovieDetailPageState extends State<MovieDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(width: 20,),
-                Icon(Icons.access_time_outlined,color: Colors.grey,),
-                SizedBox(width: 10,),
-                Text('${detailsMovie['runtime']} minutes',style: TextStyle(color: Colors.grey),),
-SizedBox(width: 30,),
+                SizedBox(
+                  width: 20,
+                ),
+                Icon(
+                  Icons.access_time_outlined,
+                  color: Colors.grey,
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                Text(
+                  '${detailsMovie['runtime']} minutes',
+                  style: TextStyle(color: Colors.grey),
+                ),
+                SizedBox(
+                  width: 30,
+                ),
                 Icon(
                   Icons.star,
                   color: Colors.grey,
@@ -222,6 +276,69 @@ SizedBox(width: 30,),
                 style: TextStyle(color: Colors.grey),
                 trimLines: 3,
                 trimMode: TrimMode.Line,
+              ),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Divider(
+              indent: 25,
+              endIndent: 25,
+              thickness: .8,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 20.0, top: 10, bottom: 10),
+              child: Text(
+                'Cast',
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 20),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: SizedBox(
+                height: 110,
+                child: ListView.separated(
+                  separatorBuilder: (context, index) {
+                    return SizedBox(
+                      width: 20,
+                    );
+                  },
+                  itemCount: movieCast.length > 6 ? 6 : movieCast.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) {
+                    var casts = movieCast[index];
+                    return Column(
+                      children: [
+                        Container(
+                            width: 70,
+                            height: 70,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.red),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(35),
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    'https://image.tmdb.org/t/p/w500${casts['profile_path']}',
+                                fit: BoxFit.cover,
+                              ),
+                            )),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text(
+                          '${casts['name']}',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ],
+                    );
+                  },
+                ),
               ),
             ),
             Padding(

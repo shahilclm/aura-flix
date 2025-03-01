@@ -3,3 +3,4 @@ const String trendingMovie='https://api.themoviedb.org/3/trending/movie/week?';
 const String relatedMovie='https://api.themoviedb.org/3/movie/';
 const String searchMovieName='https://api.themoviedb.org/3/search/movie';
 const String detailsMovies='https://api.themoviedb.org/3/movie';
+const String baseUrl='https://api.themoviedb.org/3/movie';
