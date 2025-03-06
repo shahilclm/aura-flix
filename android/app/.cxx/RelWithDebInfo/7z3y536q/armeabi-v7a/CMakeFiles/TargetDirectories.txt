@@ -1,0 +1,2 @@
+/home/shahil/Desktop/aura-flix/android/app/.cxx/RelWithDebInfo/7z3y536q/armeabi-v7a/CMakeFiles/edit_cache.dir
+/home/shahil/Desktop/aura-flix/android/app/.cxx/RelWithDebInfo/7z3y536q/armeabi-v7a/CMakeFiles/rebuild_cache.dir
